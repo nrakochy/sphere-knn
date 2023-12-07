@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use crate::lla_node::CartesianPosition;
 
-static INV_EARTH_DIAMETER: f32 = 1.0 / 12742018.0;
+const INV_EARTH_DIAMETER: f32 = 1.0 / 12742018.0;
 
 pub fn spherical_to_cartesian(lat: f64, lng: f64) -> CartesianPosition {
     let lat1 = (lat * PI) / 180.0;
