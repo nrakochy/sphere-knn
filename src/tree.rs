@@ -5,5 +5,6 @@ pub fn get_nearest_neighbors<T>(
     tree: LLANode<T>,
     opts: Opts,
 ) -> Vec<T> {
-    return vec![tree.object];
+    //return vec![tree.object];
+    unimplemented!()
 }
