@@ -20,29 +20,26 @@ fn generate_node<T>(data: T) -> LLANode<T> {
     };
 }
 
-fn build<T>(mut nodes: Vec<LLANode<T>>, mut depth: usize) -> Option<&'static LLANode<T>> {
+fn build<T>(mut nodes: &[LLANode<T>], mut depth: usize) -> Box<Option<LLANode<T>>> {
     if nodes.len() <= 1 {
-        return nodes.last();
+        return Box::new(Some(nodes[0]));
     }
-
     let axis = depth % nodes[0].position.len();
     nodes.sort_by(|a, b| a.position[axis].partial_cmp(&b.position[axis]).unwrap());
     let median = (nodes.len() as f64 * 0.5).floor() as usize;
-    let curr = nodes[depth];
+    let mut curr = nodes[depth];
     depth += 1;
-    return Some(&LLANode {
-        axis,
-        split: nodes[median].position[axis] as f64,
-        left: Box::new(build(nodes[0..median].to_vec(), depth)),
-        right: Box::new(build(nodes[median..].to_vec(), depth)),
-        ..curr
-    });
+    curr.left = build(&nodes[0..median], depth);
+    curr.right = build(&nodes[median..], depth);
+    curr.split = nodes[median].position[axis] as f64;
+    curr.axis = axis;
+    return Box::new(Some(curr))
 }
 
-pub fn build_tree<T>(data: Vec<T>) -> Option<&'static LLANode<&'static T>> {
+pub fn build_tree<T>(data: Vec<T>) -> Option<LLANode<T>> {
     // convert data to nodeable
-    let mut nodes = data.iter().map(|node| generate_node(node)).collect();
-    return build(nodes, 0);
+    let mut nodes: Vec<LLANode<T>> = data.into_iter().map(|node| generate_node(node)).collect();
+    return *build(&nodes, 0);
 }
 
 pub fn lookup<T>(lat: f64, lng: f64, tree: LLANode<T>, opts: Opts) -> Vec<T> {
