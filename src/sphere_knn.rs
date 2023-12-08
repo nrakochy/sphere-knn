@@ -4,7 +4,7 @@ use crate::{
     utils::spherical_to_cartesian,
 };
 
-fn generate_node<T>(data: T) -> LLANode<T> {
+fn generate_node<T: Clone>(data: T) -> LLANode<T> {
     let lat = 0.0;
     let lng = 0.0;
     let position = spherical_to_cartesian(lat, lng);
@@ -20,32 +20,36 @@ fn generate_node<T>(data: T) -> LLANode<T> {
     };
 }
 
-fn build<T>(mut nodes: Vec<LLANode<T>>, mut depth: usize) -> Option<&'static LLANode<T>> {
+fn build<T: Clone>(mut nodes: Vec<LLANode<T>>, mut depth: usize) -> Option<LLANode<T>> {
     if nodes.len() <= 1 {
-        return nodes.last();
+        return Some(nodes[0].clone());
     }
 
     let axis = depth % nodes[0].position.len();
     nodes.sort_by(|a, b| a.position[axis].partial_cmp(&b.position[axis]).unwrap());
     let median = (nodes.len() as f64 * 0.5).floor() as usize;
-    let curr = nodes[depth];
+    let curr = nodes[depth].clone();
     depth += 1;
-    return Some(&LLANode {
+    return Some(LLANode {
         axis,
         split: nodes[median].position[axis] as f64,
-        left: Box::new(build((nodes[0..median]).to_vec(), depth)),
-        right: Box::new(build((nodes[median..]).to_vec(), depth)),
+        left: Box::new(build(nodes[0..median].to_vec(), depth)),
+        right: Box::new(build(nodes[median..].to_vec(), depth)),
         ..curr
     });
 }
 
-pub fn build_tree<T>(data: Vec<T>) -> Option<&'static LLANode<&'static T>> {
+pub fn build_tree<T: Clone>(data: Vec<T>) -> Option<LLANode<T>> {
     // convert data to nodeable
-    let mut nodes = data.iter().map(|node| generate_node(node)).collect();
+    let nodes = data
+        .iter()
+        .cloned()
+        .map(|node| generate_node(node))
+        .collect();
     return build(nodes, 0);
 }
 
-pub fn lookup<T>(lat: f64, lng: f64, tree: LLANode<T>, opts: Opts) -> Vec<T> {
+pub fn lookup<T: Clone>(lat: f64, lng: f64, tree: LLANode<T>, opts: Opts) -> Vec<T> {
     let position = spherical_to_cartesian(lat, lng);
     return get_nearest_neighbors(position, tree, opts);
 }
