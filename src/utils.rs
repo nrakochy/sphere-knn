@@ -19,3 +19,17 @@ pub fn get_max_divisor(max_distance: Option<f32>) -> Option<f32> {
         Some(divisor)
     }
 }
+
+pub fn make_distance_calculation(a: CartesianPosition, b: CartesianPosition) -> f64 {
+    let mut i = 2; // CartesianPosition length - 1;
+    let mut distance = 0.0;
+    let mut k: f64 = 0.0;
+
+    while i >= 0 {
+        k = b[i] - a[i];
+        distance += k * k;
+        i -= 1;
+    }
+
+    return distance;
+}
