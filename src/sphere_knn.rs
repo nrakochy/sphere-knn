@@ -49,7 +49,21 @@ pub fn build_tree<T: Clone>(data: Vec<T>) -> Option<LLANode<T>> {
     return build(nodes, 0);
 }
 
-pub fn lookup<T: Clone>(lat: f64, lng: f64, tree: LLANode<T>, opts: Opts) -> Vec<T> {
+fn lookup<T: Clone>(tree: LLANode<T>, lat: f64, lng: f64, opts: Opts) -> Vec<T> {
     let position = spherical_to_cartesian(lat, lng);
     return get_nearest_neighbors(position, tree, opts);
+}
+
+fn lookup_wrapper<T: Clone>(tree: LLANode<T>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
+    move |lat: f64, lng: f64, opts: Opts| return lookup(tree.clone(), lat, lng, opts)
+}
+
+pub fn sphere_knn<T: Clone>(data: Vec<T>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
+    let maybe_tree = build_tree(data);
+    let tree = match maybe_tree {
+        Some(cur) => cur,
+        None => panic!("Failed to construct tree. This won't end well"),
+    };
+
+    return lookup_wrapper(tree);
 }
