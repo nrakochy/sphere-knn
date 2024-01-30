@@ -1,6 +1,6 @@
 pub type CartesianPosition = [f64; 3];
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct LLANode<T: Clone> {
     pub position: CartesianPosition,
     pub lat: f64,
@@ -16,6 +16,6 @@ pub struct LLANode<T: Clone> {
 }
 
 pub struct Opts {
-    max_distance_threshold: Option<i16>,
-    number_results: Option<i16>,
+    pub max_distance_threshold: Option<f64>,
+    pub number_results: Option<usize>,
 }
