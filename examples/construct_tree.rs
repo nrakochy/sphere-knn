@@ -16,5 +16,5 @@ fn main() {
         Data::new(35.690, 139.692, "Tokyo"),
     ];
     let tree = build_tree_from_nodes(data);
-    println!("{:#?}", tree.unwrap());
+    println!("{:#?}", tree);
 }

@@ -9,13 +9,12 @@ pub enum NodeOrData<T: Clone> {
     Data(Data<T>),
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct LLANode<T: Clone> {
-    pub data: Option<Data<T>>,
     pub axis: usize,
     pub split: f64,
-    pub left: Box<Option<LLANode<T>>>,
-    pub right: Box<Option<LLANode<T>>>,
+    pub left: Box<NodeOrData<T>>,
+    pub right: Box<NodeOrData<T>>,
 }
 
 #[derive(Clone, Debug, Default)]
