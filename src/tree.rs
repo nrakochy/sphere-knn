@@ -78,7 +78,7 @@ pub fn get_nearest_neighbors<T: Clone>(
                     ordered,
                     DataContainerWithDistance {
                         distance: distance_calc,
-                        data: value.data,
+                        data: value.data.unwrap(),
                     },
                 ),
                 Err(e) => println!("something amiss unpacking binary search on result obj: {e:?}"),

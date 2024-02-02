@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::{
     lla_node::{LLANode, Opts},
     tree::get_nearest_neighbors,
@@ -12,7 +14,7 @@ fn generate_node<T: Clone>(data: T) -> LLANode<T> {
         position,
         lat,
         lng,
-        data,
+        data: Some(data),
         split: 0.0,
         axis: 0,
         left: Box::new(None),
@@ -20,26 +22,33 @@ fn generate_node<T: Clone>(data: T) -> LLANode<T> {
     };
 }
 
-fn build<T: Clone>(mut nodes: Vec<LLANode<T>>, mut depth: usize) -> Option<LLANode<T>> {
-    if nodes.len() <= 1 {
+fn build<T: Clone + Debug>(mut nodes: Vec<LLANode<T>>, mut depth: usize) -> Option<LLANode<T>> {
+    if nodes.len() == 1 {
         return Some(nodes[0].clone());
     }
 
     let axis = depth % nodes[0].position.len();
     nodes.sort_by(|a, b| a.position[axis].partial_cmp(&b.position[axis]).unwrap());
     let median = (nodes.len() as f64 * 0.5).floor() as usize;
-    let curr = nodes[depth].clone();
+    // let curr = nodes[depth].clone();
     depth += 1;
     return Some(LLANode {
         axis,
         split: nodes[median].position[axis] as f64,
         left: Box::new(build(nodes[0..median].to_vec(), depth)),
         right: Box::new(build(nodes[median..].to_vec(), depth)),
-        ..curr
+        lat: 0.,
+        lng: 0.,
+        position: [0., 0., 0.],
+        data: None,
     });
 }
 
-pub fn build_tree<T: Clone>(data: Vec<T>) -> Option<LLANode<T>> {
+pub fn build_tree_from_nodes<T: Clone + Debug>(nodes: Vec<LLANode<T>>) ->  Option<LLANode<T>> {
+    return build(nodes, 0);
+}
+
+pub fn build_tree_from_data<T: Clone + Debug>(data: Vec<T>) -> Option<LLANode<T>> {
     // convert data to nodeable
     let nodes = data
         .iter()
@@ -58,12 +67,8 @@ fn lookup_wrapper<T: Clone>(tree: LLANode<T>) -> impl Fn(f64, f64, Opts) -> Vec<
     move |lat: f64, lng: f64, opts: Opts| return lookup(tree.clone(), lat, lng, opts)
 }
 
-pub fn sphere_knn<T: Clone>(data: Vec<T>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
-    let maybe_tree = build_tree(data);
-    let tree = match maybe_tree {
-        Some(cur) => cur,
-        None => panic!("Failed to construct tree. This won't end well"),
-    };
-
+pub fn sphere_knn<T: Clone + Debug>(data: Vec<T>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
+    let maybe_tree = build_tree_from_data(data);
+    let tree = maybe_tree.expect("Failed to construct tree. This won't end well");
     return lookup_wrapper(tree);
 }
