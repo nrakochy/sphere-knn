@@ -2,6 +2,13 @@ use crate::utils::spherical_to_cartesian;
 
 pub type CartesianPosition = [f64; 3];
 
+
+#[derive(Clone, Debug)]
+pub enum NodeOrData<T: Clone> {
+    Node(LLANode<T>),
+    Data(Data<T>),
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct LLANode<T: Clone> {
     pub data: Option<Data<T>>,

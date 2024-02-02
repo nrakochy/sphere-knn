@@ -33,7 +33,6 @@ fn build<T: Clone + Debug>(mut nodes: Vec<Data<T>>, mut depth: usize) -> Option<
     let axis = depth % nodes[0].position.len();
     nodes.sort_by(|a, b| a.position[axis].partial_cmp(&b.position[axis]).unwrap());
     let median = (nodes.len() as f64 * 0.5).floor() as usize;
-    // let curr = nodes[depth].clone();
     depth += 1;
     return Some(LLANode {
         axis,
