@@ -1,7 +1,7 @@
+mod lla_node;
+mod neighbors;
 mod tree;
 mod utils;
-mod lla_node;
 
 pub mod sphere_knn;
-pub use self::lla_node::{LLANode, Opts, CartesianPosition, Data};
-pub use self::sphere_knn::build_tree;
+pub use self::lla_node::{CartesianPosition, Data, LLANode, Opts};
