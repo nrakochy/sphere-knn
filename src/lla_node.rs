@@ -2,7 +2,6 @@ use crate::utils::spherical_to_cartesian;
 
 pub type CartesianPosition = [f64; 3];
 
-
 #[derive(Clone, Debug)]
 pub enum NodeOrData<T: Clone> {
     Node(LLANode<T>),
@@ -17,7 +16,7 @@ pub struct LLANode<T: Clone> {
     pub right: Box<NodeOrData<T>>,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Copy)]
 pub struct Data<T: Clone> {
     pub position: CartesianPosition,
     pub lat: f64,
@@ -36,7 +35,13 @@ impl<T: Clone> Data<T> {
     }
 }
 
+#[derive(Clone, Debug, Default, Copy)]
+/// Options for filtering results
 pub struct Opts {
-    pub max_distance_threshold: Option<f64>,
+    /// Distance in meters to consider in calculation.
+    /// Results that exceed this threshold will be omitted
+    pub max_distance_threshold_meters: Option<f64>,
+    /// Total number of results required.
+    /// There is no default, so you likely want to set this
     pub number_results: Option<usize>,
 }
