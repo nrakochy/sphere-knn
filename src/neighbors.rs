@@ -19,7 +19,7 @@ pub fn get_nearest_neighbors<T: Clone>(
     tree: NodeOrData<T>,
     opts: Opts,
 ) -> Vec<T> {
-    let max = convert_max_distance(opts.max_distance_threshold);
+    let max = convert_max_distance(opts.max_distance_threshold_meters);
     let num_results: usize = opts.number_results.unwrap_or(usize::MAX);
     let mut result: Vec<DataContainerWithDistance<T>> = vec![];
     // add it to this temp thing to make access easier below
