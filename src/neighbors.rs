@@ -14,19 +14,12 @@ struct DataContainerWithDistance<T: Clone> {
     pub distance: f64,
 }
 
-fn get_threshold(max_distance_threshold: Option<f64>) -> f64 {
-    match max_distance_threshold {
-        Some(max) => convert_max_distance(max),
-        None => f64::MAX,
-    }
-}
-
 pub fn get_nearest_neighbors<T: Clone>(
     position: CartesianPosition,
     tree: NodeOrData<T>,
     opts: Opts,
 ) -> Vec<T> {
-    let max = get_threshold(opts.max_distance_threshold);
+    let max = convert_max_distance(opts.max_distance_threshold);
     let num_results: usize = opts.number_results.unwrap_or(usize::MAX);
     let mut result: Vec<DataContainerWithDistance<T>> = vec![];
     // add it to this temp thing to make access easier below

@@ -10,12 +10,12 @@ pub fn spherical_to_cartesian(lat: f64, lng: f64) -> CartesianPosition {
     [lat.cos() * lng.cos(), lat.sin(), lat.cos() * lng.sin()]
 }
 
-pub fn convert_max_distance(max: f64) -> f64 {
-    if max <= 0.0 {
-        return f64::MAX;
-    } else {
-        return max.sin() * 2.0 * INV_EARTH_DIAMETER;
-    }
+pub fn convert_max_distance(max: Option<f64>) -> f64 {
+    return match max {
+        Some(x) if x <= 0.0 => f64::MAX,
+        Some(x) => x.sin() * 2.0 * INV_EARTH_DIAMETER,
+        None => f64::MAX,
+    };
 }
 
 pub fn make_distance_calculation(a: CartesianPosition, b: CartesianPosition) -> f64 {
