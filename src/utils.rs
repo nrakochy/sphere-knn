@@ -2,7 +2,7 @@ use std::f64::consts::PI;
 
 use crate::lla_node::CartesianPosition;
 
-const INV_EARTH_DIAMETER: f32 = 1.0 / 12742018.0;
+const INV_EARTH_DIAMETER: f64 = 1.0 / 12742018.0;
 
 pub fn spherical_to_cartesian(lat: f64, lng: f64) -> CartesianPosition {
     let lat = (lat * PI) / 180.0;
@@ -10,13 +10,11 @@ pub fn spherical_to_cartesian(lat: f64, lng: f64) -> CartesianPosition {
     [lat.cos() * lng.cos(), lat.sin(), lat.cos() * lng.sin()]
 }
 
-pub fn get_max_divisor(max_distance: Option<f32>) -> Option<f32> {
-    let max: f32 = max_distance.unwrap_or(0.0);
+pub fn convert_max_distance(max: f64) -> f64 {
     if max <= 0.0 {
-        return None;
+        return f64::MAX;
     } else {
-        let divisor: f32 = max.sin() * 2.0 * INV_EARTH_DIAMETER;
-        Some(divisor)
+        return max.sin() * 2.0 * INV_EARTH_DIAMETER;
     }
 }
 
