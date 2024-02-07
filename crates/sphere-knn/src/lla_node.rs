@@ -1,4 +1,5 @@
 use crate::utils::spherical_to_cartesian;
+use positionable::positionable;
 
 pub type CartesianPosition = [f64; 3];
 
@@ -16,7 +17,7 @@ pub struct LLANode<T: Clone> {
     pub right: Box<NodeOrData<T>>,
 }
 
-#[derive(Clone, Debug, Default, Copy)]
+#[positionable]
 pub struct Data<T: Clone> {
     pub position: CartesianPosition,
     pub lat: f64,
@@ -35,8 +36,8 @@ impl<T: Clone> Data<T> {
     }
 }
 
-#[derive(Clone, Debug, Default, Copy)]
 /// Options for filtering results
+#[positionable]
 pub struct Opts {
     /// Distance in meters to consider in calculation.
     /// Results that exceed this threshold will be omitted

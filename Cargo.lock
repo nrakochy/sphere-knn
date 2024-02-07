@@ -5,6 +5,11 @@ version = 3
 [[package]]
 name = "positionable"
 version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "proc-macro2"
@@ -48,6 +53,7 @@ dependencies = [
 name = "sphere-knn"
 version = "0.1.0"
 dependencies = [
+ "positionable",
  "serde",
 ]
 
