@@ -1,9 +1,11 @@
 use crate::{
-    lla_node::NodeOrData, neighbors::get_nearest_neighbors, tree::build_tree,
-    utils::spherical_to_cartesian, Data, Opts,
+    lla_node::{NodeOrData, SphereKnn},
+    neighbors::get_nearest_neighbors,
+    tree::build_tree,
+    utils::spherical_to_cartesian,
+    Data, Opts,
 };
-
-use core::fmt::Debug;
+use std::fmt::Debug;
 
 fn lookup<T: Clone>(tree: NodeOrData<T>, lat: f64, lng: f64, opts: Opts) -> Vec<T> {
     let position = spherical_to_cartesian(lat, lng);
@@ -15,13 +17,26 @@ fn lookup_wrapper<T: Clone>(tree: NodeOrData<T>) -> impl Fn(f64, f64, Opts) -> V
     move |lat: f64, lng: f64, opts: Opts| return lookup(tree.clone(), lat, lng, opts)
 }
 
-pub fn sphere_knn<T: Clone + Debug>(data: Vec<Data<T>>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
+fn shape_data(data: Vec<SphereKnn>) -> Vec<Data<String>> {
+    return data
+        .iter()
+        .map(|entry| entry.clone().data_morph())
+        .collect();
+}
+
+fn init<T: Clone + Debug>(data: Vec<Data<T>>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
     let tree = build_tree(data);
     return lookup_wrapper(tree);
+}
+pub fn sphere_knn(data: Vec<SphereKnn>) -> impl Fn(f64, f64, Opts) -> Vec<String> {
+    let nodes = shape_data(data);
+    return init(nodes);
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::lla_node::Geometry;
+
     use super::*;
 
     #[test]
@@ -42,7 +57,7 @@ mod tests {
             Data::new(37.567, 126.978, "Seoul"),
             Data::new(35.690, 139.692, "Tokyo"),
         ];
-        let find_nearest = sphere_knn(data);
+        let find_nearest = init(data);
         let philly = Data::new(39.95, -75.17, "Philadelphia");
         let result = find_nearest(
             philly.lat,
@@ -73,7 +88,7 @@ mod tests {
             Data::new(34.0549, -118.2426, "Los Angeles"),
             Data::new(19.4326, -99.1332, "Mexico City"),
         ];
-        let find_nearest = sphere_knn(data);
+        let find_nearest = init(data);
         let opts = Opts {
             max_distance_threshold_meters: None,
             number_results: Some(4 as usize),
@@ -111,7 +126,7 @@ mod tests {
             Data::new(37.567, 126.978, "Seoul"),
             Data::new(35.690, 139.692, "Tokyo"),
         ];
-        let find_nearest = sphere_knn(data);
+        let find_nearest = init(data);
         let hartford = Data::new(41.76, -72.67, "hartford");
         let result = find_nearest(
             hartford.lat,
@@ -122,5 +137,48 @@ mod tests {
             },
         );
         assert_eq!(result, vec!["Troy", "Boston", "New York"]);
+    }
+
+    #[test]
+    fn test_polymorphism_still_finds_result() {
+        let data = vec![
+            SphereKnn::LatLng {
+                lat: 35.690,
+                lng: 139.692,
+                id: "Tokyo",
+            },
+            SphereKnn::LatitudeLongitude {
+                latitude: 42.358,
+                longitude: -71.064,
+                id: "Boston",
+            },
+            SphereKnn::Location {
+                location: [42.732, -73.693],
+                id: "Troy",
+            },
+            SphereKnn::LatLong {
+                lat: 40.664,
+                long: -73.939,
+                id: "New York",
+            },
+            SphereKnn::Geometry {
+                id: "Miami",
+                geometry: Geometry {
+                    coordinates: [-80.224, 25.788],
+                    r#type: "geometry".to_owned(),
+                },
+            },
+        ];
+        let find_nearest = sphere_knn(data);
+        let philly = Data::new(39.95, -75.17, "Philadelphia");
+        let result = find_nearest(
+            philly.lat,
+            philly.lng,
+            Opts {
+                max_distance_threshold_meters: None,
+                number_results: Some(1 as usize),
+            },
+        );
+        assert_eq!(result, vec!["New York"]);
     }
 }
