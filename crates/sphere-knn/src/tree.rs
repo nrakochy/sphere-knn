@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use crate::lla_node::{Data, LLANode, NodeOrData};
+use crate::lla_node::{LLANode, LocationData, NodeOrData};
 
-fn build<T: Clone + Debug>(mut nodes: Vec<Data<T>>, mut depth: usize) -> NodeOrData<T> {
+fn build<T: Clone + Debug>(mut nodes: Vec<LocationData<T>>, mut depth: usize) -> NodeOrData<T> {
     if nodes.len() == 1 {
         return NodeOrData::Data(nodes[0].clone());
     }
@@ -19,6 +19,6 @@ fn build<T: Clone + Debug>(mut nodes: Vec<Data<T>>, mut depth: usize) -> NodeOrD
     });
 }
 
-pub fn build_tree<T: Clone + Debug>(nodes: Vec<Data<T>>) -> NodeOrData<T> {
+pub fn build_tree<T: Clone + Debug>(nodes: Vec<LocationData<T>>) -> NodeOrData<T> {
     build(nodes, 0)
 }
