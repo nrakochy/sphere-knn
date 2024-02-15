@@ -20,12 +20,11 @@ fn lookup_wrapper<T: Clone>(tree: NodeOrData<T>) -> impl Fn(f64, f64, Opts) -> V
 
 fn shape_data<T: Clone + SphereKnnGetters>(data: Vec<T>) -> Vec<LocationData<T>> {
     return data
-        .iter()
+        .into_iter()
         .map(|entry| {
-            let cloned = entry.clone();
-            let lat = cloned.get_lat();
-            let lng = cloned.get_lng();
-            return LocationData::new(lat, lng, cloned);
+            let lat = entry.get_lat();
+            let lng = entry.get_lng();
+            return LocationData::new(lat, lng, entry);
         })
         .collect();
 }
