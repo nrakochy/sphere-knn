@@ -33,9 +33,7 @@ fn init<T: Clone + Debug>(data: Vec<LocationData<T>>) -> impl Fn(f64, f64, Opts)
     let tree = build_tree(data);
     return lookup_wrapper(tree);
 }
-pub fn sphere_knn<T: Clone + SphereKnnGetters + Debug>(
-    data: Vec<T>,
-) -> impl Fn(f64, f64, Opts) -> Vec<T> {
+pub fn run<T: Clone + SphereKnnGetters + Debug>(data: Vec<T>) -> impl Fn(f64, f64, Opts) -> Vec<T> {
     let nodes = shape_data(data);
     return init(nodes);
 }
@@ -148,7 +146,7 @@ mod tests {
             LOS_ANGELES,
             MEXICO_CITY,
         ];
-        let find_nearest = sphere_knn(data);
+        let find_nearest = run(data);
         let philly = TestData {
             latitude: 39.95,
             longitude: -75.17,
@@ -183,7 +181,7 @@ mod tests {
             LOS_ANGELES,
             MEXICO_CITY,
         ];
-        let find_nearest = sphere_knn(data);
+        let find_nearest = run(data);
         let opts = Opts {
             max_distance_threshold_meters: None,
             number_results: Some(4 as usize),
@@ -239,7 +237,7 @@ mod tests {
             LOS_ANGELES,
             MEXICO_CITY,
         ];
-        let find_nearest = sphere_knn(data);
+        let find_nearest = run(data);
         let hartford = TestData {
             latitude: 41.76,
             longitude: -72.67,
