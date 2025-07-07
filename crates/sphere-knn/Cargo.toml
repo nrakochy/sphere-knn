@@ -1,10 +1,11 @@
 [package]
 name = "sphere-knn"
-version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+keywords = ["knn"]
+license = "MIT"
+repository = "https://github.com/nrakochy/sphere-knn"
+version = "0.1.0"
 
 [dependencies]
 serde = "1.0.192"
-positionable = { path = "../positionable" }
+positionable = { path = "../positionable", version = "0.1.0" }
